@@ -1225,3 +1225,33 @@ Library:AddToggle(RightColumn, "Equip Best", false, function(v)
 	equipBestEnabled = v
 	if v then startEquipBest() end
 end)
+
+-- অটো ক্রেইট লুপ উইথ সেফটি ডিলে
+task.spawn(function()
+    while task.wait(1) do -- প্রতি ১ সেকেন্ড পর পর ক্রেইট চেক করবে
+        pcall(function()
+            for _, crate in pairs(workspace:GetChildren()) do
+                -- আপনার গেমের ক্রেইটের নাম বা ফোল্ডার এখানে চেক হবে
+                if crate.Name == "Crate" or crate:FindFirstChild("Value") then 
+                    -- ক্রেইটের কাছে টেলিপোর্ট করো
+                    humanoidRootPart.CFrame = crate.PrimaryPart.CFrame + Vector3.new(0, 2, 0)
+                    task.wait(0.8) -- ক্রেইটের ওপর দাঁড়ানোর জন্য সময় দিবে যাতে লাল লেখা না আসে
+                end
+            end
+        end)
+    end
+end)
+
+-- ক্রেইট অটো কালেক্ট করার সেফ লজিক
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- ক্রেইটের কাছে যাওয়ার ফাংশন
+function teleportToCrate(cratePart)
+    if cratePart and cratePart:IsA("BasePart") then
+        -- সার্ভার যাতে ব্যান না করে বা এরর না দেয়, তাই একটু স্মুথ পজিশনে নেওয়া
+        humanoidRootPart.CFrame = cratePart.CFrame + Vector3.new(0, 3, 0) -- ক্রেইটের সামান্য ওপরে রাখবে
+        task.wait(0.5) -- সার্ভারের জন্য হাফ সেকেন্ড অপেক্ষা
+    end
+end
